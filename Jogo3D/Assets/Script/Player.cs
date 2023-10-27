@@ -7,11 +7,13 @@ public class Player : MonoBehaviour
 {
     public float speed;
     private CharacterController controller;
+    public float totalHealth;
     private Transform cam;
     private Vector3 moveDirection;
     public float gravity;
+    public float damage = 20;
     public float ColliderRadius;
-    
+
     private Animator anim;
 
 
@@ -19,8 +21,12 @@ public class Player : MonoBehaviour
     private float turnSmoothVelocity;
     public List<Transform> enemyList = new List<Transform>();
     private bool isWalking;
+    private bool waitFor;
+    private bool isHitting;
 
-    
+    public bool isDead;
+
+
     // Start is called before the first frame update
     void Start()
     {
@@ -39,7 +45,7 @@ public class Player : MonoBehaviour
 
     private void Move()
     {
-        if (controller.isGrounded)
+        if (controller.isGrounded && isDead)
         {
             //pegar a entrada na horizontal (Tecla direita/esquerda)
             float horizontal = Input.GetAxisRaw("Horizontal");
@@ -65,7 +71,7 @@ public class Player : MonoBehaviour
 
                     //armazena a direção
                     moveDirection = Quaternion.Euler(0f, angle, 0f) * Vector3.forward * speed;
-                
+
                     anim.SetInteger("Transitions", 1);
                     isWalking = true;
                 }
@@ -76,7 +82,7 @@ public class Player : MonoBehaviour
                 }
 
             }
-            else if(isWalking)
+            else if (isWalking)
             {
                 anim.SetInteger("Transitions", 0);
                 anim.SetBool("Walking", false);
@@ -112,19 +118,31 @@ public class Player : MonoBehaviour
 
     IEnumerator Attack()
     {
-        anim.SetBool("Attacking", true);
-        anim.SetInteger("Transitions", 2);
-        yield return new WaitForSeconds(1f);
-        GetEnemeslist();
-        
-        foreach (Transform e in enemyList)
+        if (!waitFor && !isHitting && isDead)
         {
-            Debug.Log(e.name);
+            waitFor = true;
+            anim.SetBool("Attacking", true);
+            anim.SetInteger("Transitions", 2);
+            yield return new WaitForSeconds(1f);
+            GetEnemeslist();
+
+            foreach (Transform e in enemyList)
+            {
+                //dano no inimigo
+                CombatEnemy enemy = e.GetComponent<CombatEnemy>();
+
+                if (enemy != null)
+                {
+                    enemy.GetHit(damage);
+                }
+            }
+
         }
 
         yield return new WaitForSeconds(1f);
         anim.SetInteger("Transitions", 0);
         anim.SetBool("Attacking", false);
+        waitFor = false;
 
 
     }
@@ -132,7 +150,8 @@ public class Player : MonoBehaviour
     void GetEnemeslist()
     {
         enemyList.Clear();
-        foreach (Collider c in Physics.OverlapSphere((transform.position + transform.forward * ColliderRadius), ColliderRadius))
+        foreach (Collider c in Physics.OverlapSphere((transform.position + transform.forward * ColliderRadius),
+                     ColliderRadius))
         {
             if (c.gameObject.CompareTag("Enemy"))
             {
@@ -141,9 +160,37 @@ public class Player : MonoBehaviour
         }
     }
 
+    public void GetHit(float damage)
+    {
+        totalHealth -= damage;
+        if (totalHealth > 0)
+        {
+            //esta vivo
+            StopCoroutine("Attack");
+            anim.SetInteger("Transitions", 3);
+            isHitting = true;
+            StartCoroutine("RecorveryFromHit");
+        }
+        else
+        {
+            //player esta morto
+            isDead = true;
+            anim.SetTrigger("Die");
+        }
+    }
+
+    IEnumerator RecorveryFromHit()
+    {
+        yield return new WaitForSeconds(1f);
+        anim.SetInteger("Transitions", 0);
+        isHitting = false;
+        anim.SetBool("Attacking", false);
+    }
+
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position+transform.forward, ColliderRadius);
+        Gizmos.DrawWireSphere(transform.position + transform.forward, ColliderRadius);
     }
-}                                                                                                                                                                                                                
+}
+                                                                                                                                                                                                                   

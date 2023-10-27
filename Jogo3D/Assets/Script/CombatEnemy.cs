@@ -7,11 +7,12 @@ using UnityEngine.AI;
 public class CombatEnemy : MonoBehaviour
 {
     [Header("Atributes")]
-    public float totalHealth;
+    public float totalHealth = 100;
     public float attackDamage;
     public float movementSpeed;
     public float lookRadius;
     public float colliderRadius = 2;
+    public float rotationSpeed;
 
     [Header("Components")]
     private Animator anim;
@@ -25,6 +26,7 @@ public class CombatEnemy : MonoBehaviour
     private bool attacking;
     private bool Hiting;
     private bool waitfor;
+    private bool playerIsDead;
     void Start()
     {
         anim = GetComponent<Animator>();
@@ -33,43 +35,49 @@ public class CombatEnemy : MonoBehaviour
         player = GameObject.FindGameObjectWithTag("Player").transform;
     }
 
-   
+
     void Update()
     {
-        float distance = Vector3.Distance(player.position, transform.position);
-        if ((distance <= lookRadius))
+        if (totalHealth > 0)
         {
-            //O personagem esta no raio de ação
-            Agent.isStopped = false;
-            if (!attacking)
+            float distance = Vector3.Distance(player.position, transform.position);
+            if ((distance <= lookRadius))
             {
-                Agent.SetDestination(player.position);
-                anim.SetBool("Walk Forward", true);
-                walking = true;
-            }
-            if (distance <= Agent.stoppingDistance)
-            {
-                StartCoroutine("Attack");
+                //O personagem esta no raio de ação
+                Agent.isStopped = false;
+                if (!attacking)
+                {
+                    Agent.SetDestination(player.position);
+                    anim.SetBool("Walk Forward", true);
+                    walking = true;
+                }
+
+                if (distance <= Agent.stoppingDistance)
+                {
+                    StartCoroutine("Attack");
+                    LookTarget();
+                }
+                else
+                {
+                    attacking = false;
+                }
             }
             else
             {
+                //O personagem não esta no raio de ação
+                anim.SetBool("Walk Forward", false);
+                Agent.isStopped = true;
+                walking = false;
                 attacking = false;
+
             }
-        }
-        else
-        {
-            //O personagem não esta no raio de ação
-            anim.SetBool("Walk Forward", false);
-            Agent.isStopped = true;
-            walking = false;
-            attacking = false;
 
         }
     }
     
     IEnumerator Attack()
     {
-        if (!waitfor)
+        if (!waitfor && !Hiting)
         {
             waitfor = true;
             attacking = true;
@@ -81,6 +89,11 @@ public class CombatEnemy : MonoBehaviour
             yield return new WaitForSeconds(1f);
             waitfor = false;
         }
+
+        if (player.GetComponent<Player>().isDead)
+        {
+            
+        }
     }
 
     void GetPlayer()
@@ -90,7 +103,8 @@ public class CombatEnemy : MonoBehaviour
             if (c.gameObject.CompareTag("Player"))
             {
               //vai causar dano do player
-              Debug.Log("Bateu");
+              c.gameObject.GetComponent<Player>().GetHit(attackDamage);
+              playerIsDead = c.gameObject.GetComponent<Player>().isDead;
             }
         }
     }
@@ -104,10 +118,12 @@ public class CombatEnemy : MonoBehaviour
             StopCoroutine("Attack");
             anim.SetTrigger("Take Damage");
             Hiting = true;
+            StartCoroutine("RecorveryFromHit");
         }
         else
         {
             //esta morto
+            anim.SetTrigger("Die");
         }
     }
 
@@ -118,6 +134,13 @@ public class CombatEnemy : MonoBehaviour
         anim.SetBool("Web Attack", false);
         Hiting = false;
         waitfor = false;
+    }
+
+    void LookTarget()
+    {
+        Vector3 direction = (player.position - transform.position).normalized;
+        Quaternion LookRotation = Quaternion.LookRotation(new Vector3(direction.x, 0, direction.z));
+        transform.rotation = Quaternion.Slerp(transform.rotation, LookRotation, Time.deltaTime * rotationSpeed);
     }
 
     private void OnDrawGizmosSelected()

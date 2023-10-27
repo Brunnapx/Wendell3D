@@ -292,11 +292,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3dd7bfbadd6f4e74aad31ce415a969c1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  totalHealth: 0
-  attackDamage: 0
+  totalHealth: 100
+  attackDamage: 50
   movementSpeed: 0
   lookRadius: 5.22
   colliderRadius: 2
+  rotationSpeed: 0
 --- !u!195 &9718992
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -329,7 +330,7 @@ CapsuleCollider:
   m_Material: {fileID: 0}
   m_IsTrigger: 0
   m_Enabled: 1
-  m_Radius: 1.24
+  m_Radius: 1.63
   m_Height: 1
   m_Direction: 1
   m_Center: {x: 0, y: 1.03, z: 0}
@@ -600,7 +601,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 122305316}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.3, y: -4.67, z: 6.25}
+  m_LocalPosition: {x: 0.3, y: -4.67, z: 6.113}
   m_LocalScale: {x: 0.52645594, y: 0.52645594, z: 0.52645594}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -8458,15 +8459,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 400144, guid: c60e4208f504c9b428686973db80059f, type: 3}
       propertyPath: m_LocalScale.x
-      value: 0.8033184
+      value: 0.5761078
       objectReference: {fileID: 0}
     - target: {fileID: 400144, guid: c60e4208f504c9b428686973db80059f, type: 3}
       propertyPath: m_LocalScale.y
-      value: 0.8033184
+      value: 0.5761078
       objectReference: {fileID: 0}
     - target: {fileID: 400144, guid: c60e4208f504c9b428686973db80059f, type: 3}
       propertyPath: m_LocalScale.z
-      value: 0.8033184
+      value: 0.5761078
       objectReference: {fileID: 0}
     - target: {fileID: 400144, guid: c60e4208f504c9b428686973db80059f, type: 3}
       propertyPath: m_LocalPosition.x
@@ -8474,11 +8475,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 400144, guid: c60e4208f504c9b428686973db80059f, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -5.3062
+      value: -5.0841
       objectReference: {fileID: 0}
     - target: {fileID: 400144, guid: c60e4208f504c9b428686973db80059f, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 5.1978
+      value: 5.1884
       objectReference: {fileID: 0}
     - target: {fileID: 400144, guid: c60e4208f504c9b428686973db80059f, type: 3}
       propertyPath: m_LocalRotation.w
@@ -11650,10 +11651,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 5
+  totalHealth: 100
   gravity: 10
+  damage: 20
   ColliderRadius: 0.55
   smoothRotTime: 0.1
   enemyList: []
+  isDead: 0
 --- !u!143 &919132148876225694
 CharacterController:
   m_ObjectHideFlags: 0
