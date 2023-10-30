@@ -3,31 +3,35 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using Random = System.Random;
 
 public class CombatEnemy : MonoBehaviour
 {
-    [Header("Atributes")]
-    public float totalHealth = 100;
+    [Header("Atributes")] public float totalHealth = 100;
     public float attackDamage;
     public float movementSpeed;
     public float lookRadius;
     public float colliderRadius = 2;
     public float rotationSpeed;
 
-    [Header("Components")]
-    private Animator anim;
+    [Header("Components")] private Animator anim;
     private CapsuleCollider capsule;
     private NavMeshAgent Agent;
 
-    [Header("Others")] 
-    private Transform player;
+    [Header("Others")] private Transform player;
 
     private bool walking;
     private bool attacking;
     private bool Hiting;
     private bool waitfor;
-    private bool playerIsDead;
-    void Start()
+    public bool playerIsDead;
+
+    [Header("wayPoints")] public List<Transform> wayPoints = new List<Transform>();
+    public int currentPathIndex;
+    public float pathDistance;
+
+
+void Start()
     {
         anim = GetComponent<Animator>();
         capsule = GetComponent<CapsuleCollider>();
@@ -66,33 +70,53 @@ public class CombatEnemy : MonoBehaviour
             {
                 //O personagem não esta no raio de ação
                 anim.SetBool("Walk Forward", false);
-                Agent.isStopped = true;
+                //Agent.isStopped = true;
                 walking = false;
                 attacking = false;
+                MoveToWayPoint();
 
             }
 
         }
     }
+
+    void MoveToWayPoint()
+    {
+        if (wayPoints.Count > 0)
+        {
+            float distance = Vector3.Distance(wayPoints[currentPathIndex].position, transform.position);
+            Agent.destination = wayPoints[currentPathIndex].position;
+
+            if (distance <= pathDistance)
+            {
+                // parte para o proximo ponto
+                currentPathIndex = Random.Range(0, wayPoints.Count);
+            }
+        }
+    }
     
     IEnumerator Attack()
     {
-        if (!waitfor && !Hiting)
+        if (!waitfor && !Hiting && !playerIsDead)
         {
             waitfor = true;
             attacking = true;
             walking = false;
             anim.SetBool("Web Attack", true);
             anim.SetBool("Walk Forward", false);
-            yield return new WaitForSeconds(1f);
+            yield return new WaitForSeconds (1.2f);
             GetPlayer();
-            yield return new WaitForSeconds(1f);
+            //yield return new WaitForSeconds(1f)
             waitfor = false;
         }
 
-        if (player.GetComponent<Player>().isDead)
+        if (playerIsDead)
         {
-            
+            anim.SetBool("Web Attack", false);
+            anim.SetBool("Walk Forward", false);
+            walking = false;
+            attacking = false;
+            Agent.isStopped = true;
         }
     }
 

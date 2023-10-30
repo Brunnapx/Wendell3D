@@ -38,14 +38,17 @@ public class Player : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Move();
-        GetMouseInput();
+        if (!isDead)
+        {
+            Move();
+            GetMouseInput();
+        }
     }
 
 
     private void Move()
     {
-        if (controller.isGrounded && isDead)
+        if (controller.isGrounded)
         {
             //pegar a entrada na horizontal (Tecla direita/esquerda)
             float horizontal = Input.GetAxisRaw("Horizontal");
@@ -118,12 +121,12 @@ public class Player : MonoBehaviour
 
     IEnumerator Attack()
     {
-        if (!waitFor && !isHitting && isDead)
+        if (!waitFor && !isHitting)
         {
             waitFor = true;
             anim.SetBool("Attacking", true);
             anim.SetInteger("Transitions", 2);
-            yield return new WaitForSeconds(1f);
+            yield return new WaitForSeconds(0.4f);
             GetEnemeslist();
 
             foreach (Transform e in enemyList)
