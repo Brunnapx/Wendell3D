@@ -90,8 +90,12 @@ void Start()
             if (distance <= pathDistance)
             {
                 // parte para o proximo ponto
-                currentPathIndex = Random.Range(0, wayPoints.Count);
+                currentPathIndex = UnityEngine.Random.Range(0, wayPoints.Count);
             }
+            
+            anim.SetBool("Walk Forward", true);
+            walking = true;
+            
         }
     }
     
