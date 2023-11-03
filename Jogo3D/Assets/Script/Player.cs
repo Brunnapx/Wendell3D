@@ -7,7 +7,7 @@ public class Player : MonoBehaviour
 {
     public float speed;
     private CharacterController controller;
-    public float totalHealth;
+    public float totalHealth = 100;
     private Transform cam;
     private Vector3 moveDirection;
     public float gravity;
@@ -33,6 +33,8 @@ public class Player : MonoBehaviour
         controller = GetComponent<CharacterController>();
         cam = Camera.main.transform;
         anim = GetComponent<Animator>();
+        
+        GameController.instance.Coracao(totalHealth);
     }
 
     // Update is called once per frame
@@ -43,6 +45,7 @@ public class Player : MonoBehaviour
             Move();
             GetMouseInput();
         }
+        
     }
 
 
@@ -166,6 +169,7 @@ public class Player : MonoBehaviour
     public void GetHit(float damage)
     {
         totalHealth -= damage;
+        GameController.instance.Coracao(totalHealth);
         if (totalHealth > 0)
         {
             //esta vivo
@@ -182,6 +186,12 @@ public class Player : MonoBehaviour
         }
     }
 
+    public void IncreaseHealth(float value)
+    {
+        totalHealth += value;
+        GameController.instance.Coracao(totalHealth);
+    }
+    
     IEnumerator RecorveryFromHit()
     {
         yield return new WaitForSeconds(1f);
