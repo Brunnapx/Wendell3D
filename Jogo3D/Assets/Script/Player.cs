@@ -69,8 +69,7 @@ public class Player : MonoBehaviour
                     float angle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg + cam.eulerAngles.y;
 
                     //aemazena a rotação mais suave
-                    float smoothAngle = Mathf.SmoothDampAngle(transform.eulerAngles.y, angle, ref turnSmoothVelocity,
-                        smoothRotTime);
+                    float smoothAngle = Mathf.SmoothDampAngle(transform.eulerAngles.y, angle, ref turnSmoothVelocity, smoothRotTime);
 
                     //rotaciona o personagem
                     transform.rotation = Quaternion.Euler(0f, smoothAngle, 0f);
@@ -116,7 +115,7 @@ public class Player : MonoBehaviour
 
                 if (!anim.GetBool("Walking"))
                 {
-                    StartCoroutine(Attack());
+                    StartCoroutine("Attack");
                 }
             }
         }
@@ -129,7 +128,7 @@ public class Player : MonoBehaviour
             waitFor = true;
             anim.SetBool("Attacking", true);
             anim.SetInteger("Transitions", 2);
-            yield return new WaitForSeconds(0.4f);
+            yield return new WaitForSeconds(1.2f);
             GetEnemeslist();
 
             foreach (Transform e in enemyList)
@@ -156,8 +155,7 @@ public class Player : MonoBehaviour
     void GetEnemeslist()
     {
         enemyList.Clear();
-        foreach (Collider c in Physics.OverlapSphere((transform.position + transform.forward * ColliderRadius),
-                     ColliderRadius))
+        foreach (Collider c in Physics.OverlapSphere((transform.position + transform.forward * ColliderRadius), ColliderRadius))
         {
             if (c.gameObject.CompareTag("Enemy"))
             {
@@ -176,13 +174,13 @@ public class Player : MonoBehaviour
             StopCoroutine("Attack");
             anim.SetInteger("Transitions", 3);
             isHitting = true;
-            StartCoroutine("RecorveryFromHit");
+            StartCoroutine("RecorveryHit");
         }
         else
         {
             //player esta morto
             isDead = true;
-            anim.SetTrigger("Die");
+            anim.SetTrigger("die");
         }
     }
 
@@ -192,7 +190,7 @@ public class Player : MonoBehaviour
         GameController.instance.Coracao(totalHealth);
     }
     
-    IEnumerator RecorveryFromHit()
+    IEnumerator RecorveryHit()
     {
         yield return new WaitForSeconds(1f);
         anim.SetInteger("Transitions", 0);
