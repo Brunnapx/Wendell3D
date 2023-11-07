@@ -25,10 +25,13 @@ public class CombatEnemy : MonoBehaviour
     private bool Hiting;
     private bool waitfor;
     public bool playerIsDead;
+ 
 
     [Header("wayPoints")] public List<Transform> wayPoints = new List<Transform>();
     public int currentPathIndex;
     public float pathDistance;
+
+    public AudioSource AranhaAtacando;
 
 
 void Start()
@@ -45,7 +48,7 @@ void Start()
         if (totalHealth > 0)
         {
             float distance = Vector3.Distance(player.position, transform.position);
-            if ((distance <= lookRadius))
+            if (distance <= lookRadius)
             {
                 //O personagem esta no raio de ação
                 Agent.isStopped = false;
@@ -103,6 +106,7 @@ void Start()
     {
         if (!waitfor && !Hiting && !playerIsDead)
         {
+            AranhaAtacando.Play();
             waitfor = true;
             attacking = true;
             walking = false;

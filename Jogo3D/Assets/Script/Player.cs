@@ -26,6 +26,10 @@ public class Player : MonoBehaviour
 
     public bool isDead;
 
+    public AudioSource PLayerAtacando;
+    public AudioSource PlayerMorrendo;
+    public AudioSource Coin;
+
 
     // Start is called before the first frame update
     void Start()
@@ -125,6 +129,7 @@ public class Player : MonoBehaviour
     {
         if (!waitFor && !isHitting)
         {
+            PLayerAtacando . Play();
             waitFor = true;
             anim.SetBool("Attacking", true);
             anim.SetInteger("Transitions", 2);
@@ -167,6 +172,7 @@ public class Player : MonoBehaviour
     public void GetHit(float damage)
     {
         totalHealth -= damage;
+        PlayerMorrendo . Play();
         GameController.instance.Coracao(totalHealth);
         if (totalHealth > 0)
         {
@@ -202,6 +208,14 @@ public class Player : MonoBehaviour
     {
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position + transform.forward, ColliderRadius);
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.tag == "Coin")
+        {
+            Coin.Play();
+        }
     }
 }
                                                                                                                                                                                                                    
